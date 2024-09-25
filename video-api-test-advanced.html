@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小姐姐短视频</title>
+    <style>
+      h1 {
+        margin: 5px;
+        opacity: 0.6;
+        font-size: 20px;
+      }
+      .action-more {
+        margin-left: 30px;
+        font-size: 25px;
+        cursor: pointer;
+      }
+      .action-more:active,
+      .action-more:hover {
+        color: #e35520;
+      }
+      /* 视频容器 */
+      .video-list {
+        height: 350px;
+        overflow: hidden;
+      }
+      /* 视频尺寸： 小 */
+      .video-list.video-list--small {
+        height: 350px;
+      }
+      .video-list.video-list--small video {
+        width: 200px;
+        height: 300px;
+      }
+      /* 视频尺寸： 中 */
+      .video-list.video-list--middle {
+        height: 500px;
+      }
+      .video-list.video-list--middle video {
+        width: 300px;
+        height: 450px;
+      }
+      /* 视频尺寸： 大 */
+      .video-list.video-list--large {
+        height: 650px;
+      }
+      .video-list.video-list--large video {
+        width: 400px;
+        height: 600px;
+      }
+      /* 视频详情 */
+      .video-list .video-detail {
+        /* 默认不展示 */
+        display: none;
+        margin: 2px 0 10px 10px;
+        font-size: 12px;
+        color: gray;
+      }
+      .video-list .video-detail .video-detail-date {
+        margin-left: 5px;
+        color: #FF9800;
+      }
+      .video-list.video-list--show-detail {
+        /* “增高”一点，以展示全部内容 */
+        padding-bottom: 15px;
+      }
+      .video-list.video-list--show-detail .video-detail {
+        display: block;
+      }
+      .action-bar {
+        display: block;
+        padding: 0 10px 10px;
+      }
+      .u-action {
+        margin-right: 6px;
+      }
+      .icon-item {
+        cursor: pointer;
+        line-height: 1;
+      }
+      .icon-unstart .unstart {
+        color: #FFF176;
+        font-size: 30px;
+      }
+      .icon-unstart .stared {
+        display: none;
+      }
+      .icon-start .unstart {
+        display: none;
+      }
+      .icon-start .stared {
+        display: inline-block;
+        color: #FFEB3B;
+        font-size: 28px;
+      }
+      iconify-icon {
+        height: 20px;
+      }
+      .u-action-prev,
+      .u-action-next {
+        padding: 2px 8px;
+        border: 1px solid #e0f2fe;
+        border-radius: 9999px;
+        background-color: #f0f9ff;
+        color: #0284c7;
+        font-size: 14px;
+        cursor: pointer;
+      }
+    </style>
+    <style>
+      .dialog-title {
+        margin-bottom: 30px;
+        font-size: 24px;
+        /* color: cornflowerblue; */
+        color: #1565C0;
+      }
+      .dialog-content .item-field {
+        float: left;
+        min-width: 110px;
+        margin-right: 10px;
+        text-align: center;
+        color: #2196F3;
+      }
+      .dialog-content .item-group .item-value {
+        margin-right: 10px;
+        padding: 2px 8px;
+        border: 1px solid #e0f2fe;
+        border-radius: 5px;
+        background-color: #f0f9ff;
+        font-size: 14px;
+        color: #0284c7;
+        cursor: pointer;
+      }
+      .dialog-content .item-group .item-value:hover {
+        border-color: #0284c7;
+      }
+      .dialog-content .item-group .item-value.item-value--active {
+        /* border-color: #0284c7; */
+        /* background-color: #0284c7; */
+        border-color: transparent;
+        background-color: rgb(2 132 199 / 80%);
+        color: white;
+      }
+      @media screen and (max-width: 768px) {
+        /* 在屏幕宽度小于等于 768px 时生效的样式 */
+        .dialog-content .setting-line {
+          margin-bottom: 20px;
+        }
+        .dialog-content .setting-line--m-3 .item-field {
+          line-height: 3.5;
+        }
+        .dialog-content .setting-line--m-3 .item-value {
+          white-space: nowrap;
+          line-height: 2.2;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1 id="headTitle">小姐姐短视频
+        <span class="action-more" id="moreMenu">
+          <iconify-icon icon="fluent:more-circle-32-regular"></iconify-icon>
+        </span>
+      </h1>
+
+      <div class="video-list video-list--middle" id="videoList">
+        <div class="video-item">
+          <!-- <video>的尺寸由样式决定 -->
+          <video width="200" height="300" controls loop playsinline>
+            <source src="https://alimov2.a.kwimgs.com/upic/2023/06/29/09/BMjAyMzA2MjkwOTUwMTFfMjI1MzQ3MjU0M18xMDY2ODY0MjcxNzNfMV8z_b_B7ebf143c394948577fadd6f60cd8ef89.mp4?clientCacheKey=3xsarx8xepz5yq6_b.mp4&tt=b&di=78e498d6&bp=13414" type="video/mp4">
+          </video>
+          <!-- 视频详情 -->
+          <div class="video-detail">
+            该视频 发布于
+            <span class="video-detail-date">2023年06月29日</span>
+          </div>
+
+          <span class="action-bar">
+            <span class="u-action u-action-prev">上一个</span>
+            <span class="u-action u-action-next">下一个</span>
+            <!-- 收藏后加class icon-start -->
+            <span class="u-action icon-item icon-unstart">
+              <iconify-icon icon="ant-design:star-outlined" class="unstart"></iconify-icon>
+              <iconify-icon icon="flowbite:star-solid" class="stared"></iconify-icon>
+            </span>
+          </span>
+        </div>
+      </div>
+
+
+      <!-- 视频模板 -->
+      <div id="videoItemTemplete" style="display: none;">
+        <div class="video-item">
+          <video controls autoplay loop playsinline>
+            <source type="video/mp4">
+          </video>
+          <div class="video-detail">
+            该视频 发布于
+            <span class="video-detail-date">-</span>
+          </div>
+          <span class="action-bar">
+            <span class="u-action u-action-prev">上一个</span>
+            <span class="u-action u-action-next">下一个</span>
+            <span class="u-action icon-item icon-unstart">
+              <iconify-icon icon="ant-design:star-outlined" class="unstart"></iconify-icon>
+              <iconify-icon icon="flowbite:star-solid" class="stared"></iconify-icon>
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- 设置面板 -->
+      <div id="settingPanel" style="display: none;">
+        <div class="dialog-title">
+          | 设置内容 |
+        </div>
+
+        <div class="dialog-content">
+          <p class="setting-line">
+            <span class="item-field">视频尺寸</span>
+            <span class="item-group item-group-vsize">
+              <span class="item-value" data-value="small">小</span>
+              <span class="item-value item-value--active" data-value="middle">中</span>
+              <span class="item-value" data-value="large">大</span>
+            </span>
+          </p>
+          <p class="setting-line setting-line--m-3">
+            <span class="item-field">视频源</span>
+            <span class="item-group item-group-vsrc">
+              <span class="item-value item-value--active" data-value="api_1">默认</span>
+              <span class="item-value" data-value="api_2">更性感一点</span>
+            </span>
+          </p>
+          <p class="setting-line setting-line--m-3">
+            <span class="item-field">展示视频详情</span>
+            <span class="item-group item-group-vdetail">
+              <span class="item-value item-value--active" data-value="hide">不展示（默认）</span>
+              <span class="item-value" data-value="show">展示</span>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="./lib/iconify-icon.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.6.0.min.js"></script>
+    <script>
+      var videoUtils = {
+        // 暂停视频（找到子元素<video>）
+        pause: ($videoItem) => {
+          var result = true;
+          try {
+            $videoItem.find("video")[0].pause();
+          } catch (error) {
+            // 视频未加载成功 则 pause() 会抛出异常
+            result = false;
+            // then do nothing
+          }
+          return result;
+        },
+        // 存储视频地址(自动找到 .video-item容器 下的视频地址)
+        saveVideoSrc: (actionItem, storeKey) => {
+          var $videoItem = null;
+          if ($(actionItem).hasClass("video-item")) {
+            $videoItem = $(actionItem);
+          }
+          else {
+            $videoItem = $(actionItem).parents(".video-item");
+          }
+
+          var src = $videoItem.find("video source").attr("src");
+
+          storeKey = storeKey || "video_src_list";
+          var video_src_list_string = localStorage.getItem(storeKey);
+          var videoList = video_src_list_string ? JSON.parse(video_src_list_string) : [];
+          videoList.push(src);
+          localStorage.setItem(storeKey, JSON.stringify(videoList));
+        },
+        videoSource: {
+          // 默认，接口速度快
+          api_1: "https://api.kuleu.com/api/xjj?type=json",
+          // 接口速度较慢，视频质量较好
+          api_2: "https://tools.mgtv100.com/external/v1/pear/xjj",
+          // 当前接口
+          current: "api_1",
+        },
+        // 获取视频地址，有回调
+        getNewVideo: (callback) => {
+          $.get(videoUtils.videoSource[videoUtils.videoSource.current], function(data) {
+            console.log("json:", data);
+
+            if (data.code == 200) {
+              // 针对各接口 响应数据结构 做兼容
+              var videoSrc = data.video || data.data;
+              console.log(videoSrc);
+              // 触发回调
+              callback && callback(videoSrc, data);
+            }
+            else if (callback) {
+              callback(false, data);
+            }
+            else {
+              // 默认提示
+              window.toastr.show("服务器繁忙，请稍后重试~");
+            }
+          })
+          // 网络错误处理
+          .catch(function () {
+            window.toastr.show("网络异常，请稍后重试~");
+          });
+        },
+        // 从URL中获取日期
+        getDateFromUrl: (url) => {
+          // 从URL中 获取日期
+          var regResult = url.match(/upic\/((\d+\/)+)/);
+          // console.log("正则匹配日期结果：", regResult);
+          var result = "-";
+          try {
+            if (regResult && regResult[1]) {
+              result = regResult[1].slice(0, 10).replace("/", "年").replace("/", "月").replace("/", "") + "日";
+            }
+          } catch (error) {
+            // do nothing
+          }
+          return result;
+        },
+      };
+
+      // 视频操作
+      $(function () {
+        // 提示工具
+        var toastr = new Toastr();
+        window.toastr = toastr;
+
+        // 下一条
+        $(".video-list")
+        .on("click", ".u-action-next", function () {
+          var lastVideoItem = $(this).parents(".video-item");
+
+          // 如果已经有下一条，则直接切换
+          if (lastVideoItem.next(".video-item").length > 0) {
+            console.log("下一条已加载，直接切换~");
+            // 滑走上一个视频
+            lastVideoItem.slideUp(function () {
+              // console.log("slideUp done, video pause!");
+              // 可能还没播放完，需要先暂停
+              videoUtils.pause(lastVideoItem);
+            });
+            // 显示下一个视频
+            lastVideoItem.next(".video-item").fadeIn(function () {
+              // 继续播放
+              $(this).find("video")[0].play();
+            });
+            return;
+          }
+
+          // 没有下一条，则加载新视频
+          videoUtils.getNewVideo(function (videoSrc, responseJSON) {
+            if (videoSrc && (videoSrc.indexOf(".mp4") > 0)) {
+              var videoItem = $($("#videoItemTemplete").html());
+              var videoSource = videoItem.find("video source");
+              // 事件监听
+              // videoSource.parent()[0].addEventListener('loadeddata', () => {
+              //   console.log("video event: loadeddata 媒体的首帧已加载完成");
+              // });
+              // videoSource.parent()[0].addEventListener('loadedmetadata', () => {
+              //   console.log("video event: loadedmetadata 元数据已加载完毕");
+              // });
+              videoSource.attr("src", videoSrc);
+              $("#videoList").append(videoItem);
+
+              // 填充 视频发布日期
+              videoItem.find(".video-detail-date").text(videoUtils.getDateFromUrl(videoSrc));
+
+              // 滑走上一个视频
+              lastVideoItem.slideUp(function () {
+                // console.log("slideUp done, video pause!");
+                // 可能还没播放完，需要先暂停
+                videoUtils.pause(lastVideoItem);
+              });
+
+              // 保存视频地址
+              videoUtils.saveVideoSrc(videoItem, "ALL_SRC_LIST");
+            }
+            else {
+              toastr.show("无效播放地址 或 不支持的视频格式~");
+            }
+          });
+        })
+        // 上一条
+        .on("click", ".u-action-prev", function () {
+          // console.log(" .u-action-prev click", this);
+          var videoItem = $(this).parents(".video-item");
+
+          if (videoItem.prev(".video-item").length == 0) {
+            // console.log("没有上一条了~");
+            toastr.show("没有上一条了~");
+            return;
+          }
+
+          // 可能还没播放完，需要先暂停
+          videoUtils.pause(videoItem);
+          // 隐藏当前条
+          videoItem.fadeOut();
+
+          // 显示上一条
+          videoItem.prev(".video-item").slideDown(function () {
+            // 继续播放
+            $(this).find("video")[0].play();
+          });
+        })
+        // 收藏
+        .on("click", ".unstart", function () {
+          // console.log(" .unstart click", this);
+
+          $(this).parent().addClass("icon-start");
+          // 将视频id及地址 存在本地
+
+          // 保存视频地址
+          videoUtils.saveVideoSrc(this, "USER_LIKE_LIST");
+        })
+        // 取消收藏
+        .on("click", ".stared", function () {
+          // console.log(" .stared click", this);
+
+          $(this).parent().removeClass("icon-start");
+          // 从本地数据删除收藏信息
+        });
+
+        // 菜单
+        $("#moreMenu").click(function () {
+          // console.log("开发中~");
+
+          $("#settingPanel").modal();
+        });
+      });
+
+      // 设置面板
+      $(function () {
+        // 通用处理
+        $(".dialog-content").on("click", ".setting-line .item-value", function () {
+          $(this).siblings().removeClass("item-value--active");
+          $(this).addClass("item-value--active");
+        });
+
+        // 视频源
+        $(".dialog-content").on("click", ".item-group-vsrc .item-value", function () {
+          videoUtils.videoSource.current = $(this).data("value");
+          window.toastr.show("视频源切换成功~");
+        });
+
+        // 视频尺寸
+        $(".dialog-content").on("click", ".item-group-vsize .item-value", function () {
+          $("#videoList").removeClass("video-list--small video-list--middle video-list--large")
+            .addClass("video-list--" + $(this).data("value"));
+          window.toastr.show("视频尺寸已切换为： " + $(this).text());
+        });
+
+        // 视频详情
+        $(".dialog-content").on("click", ".item-group-vdetail .item-value", function () {
+          if ($(this).data("value") === "show") {
+            $("#videoList").addClass("video-list--show-detail");
+            window.toastr.show("已显示视频发布日期");
+          }
+          else {
+            $("#videoList").removeClass("video-list--show-detail");
+            window.toastr.show("已隐藏视频发布日期");
+          }
+        });
+      });
+
+      // 调试模式
+      $(function () {
+        if (location.href.indexOf("debug") < 0) {
+          console.log("normal mode");
+          return;
+        }
+
+        var clickTimes = 0;
+        $("#headTitle").click(() => {
+          clickTimes++;
+
+          if (clickTimes >= 3) {
+            // 多次调用 eruda.init() 也没关系
+            if (!window.eruda || !window.eruda._isInit) {
+              $.getScript("https://cdn.jsdelivr.net/npm/eruda", function(data, textStatus, jqxhr) {
+              eruda.init();
+              });
+            }
+          }
+
+          // 5秒后 清零
+          setTimeout(() => {
+            clickTimes = 0;
+          }, 5e3);
+        });
+      });
+    </script>
+
+    <link rel="stylesheet" href="./lib/toastr.min.css">
+    <script src="./lib/toastr.min.js" defer></script>
+    <link rel="stylesheet" href="./lib/jquery.modal-0.9.1.min.css">
+    <script src="./lib/jquery.modal-0.9.1.min.js" defer></script>
+  </body>
+</html>

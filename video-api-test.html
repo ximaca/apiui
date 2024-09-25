@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小姐姐短视频</title>
+    <style>
+      h1 {
+        margin: 5px;
+        opacity: 0.6;
+        font-size: 20px;
+      }
+      .action-more {
+        margin-left: 30px;
+        font-size: 25px;
+        cursor: pointer;
+      }
+      .action-more:hover {
+        color: #e35520;
+      }
+      /* 视频容器 */
+      .video-list {
+        height: 350px;
+        overflow: hidden;
+      }
+      .action-bar {
+        display: block;
+        padding: 0 10px 10px;
+      }
+      .u-action {
+        margin-right: 6px;
+      }
+      .icon-item {
+        cursor: pointer;
+        line-height: 1;
+      }
+      .icon-unstart .unstart {
+        color: #FFF176;
+        font-size: 30px;
+      }
+      .icon-unstart .stared {
+        display: none;
+      }
+      .icon-start .unstart {
+        display: none;
+      }
+      .icon-start .stared {
+        display: inline-block;
+        color: #FFEB3B;
+        font-size: 28px;
+      }
+      iconify-icon {
+        height: 20px;
+      }
+      .u-action-prev,
+      .u-action-next {
+        padding: 2px 8px;
+        border: 1px solid #e0f2fe;
+        border-radius: 9999px;
+        background-color: #f0f9ff;
+        color: #0284c7;
+        font-size: 14px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1 id="headTitle">小姐姐短视频
+        <span class="action-more" id="moreMenu">
+          <iconify-icon icon="fluent:more-circle-32-regular"></iconify-icon>
+        </span>
+      </h1>
+      <div class="video-list" id="videoList">
+        <div class="video-item">
+          <video width="200" height="300" controls loop>
+            <source src="https://alimov2.a.kwimgs.com/upic/2023/06/29/09/BMjAyMzA2MjkwOTUwMTFfMjI1MzQ3MjU0M18xMDY2ODY0MjcxNzNfMV8z_b_B7ebf143c394948577fadd6f60cd8ef89.mp4?clientCacheKey=3xsarx8xepz5yq6_b.mp4&tt=b&di=78e498d6&bp=13414" type="video/mp4">
+          </video>
+
+          <span class="action-bar">
+            <span class="u-action u-action-prev">上一个</span>
+            <span class="u-action u-action-next">下一个</span>
+            <!-- 收藏后加class icon-start -->
+            <span class="u-action icon-item icon-unstart">
+              <iconify-icon icon="ant-design:star-outlined" class="unstart"></iconify-icon>
+              <iconify-icon icon="flowbite:star-solid" class="stared"></iconify-icon>
+            </span>
+          </span>
+        </div>
+      </div>
+
+
+      <!-- 视频模板 -->
+      <div id="videoItemTemplete" style="display: none;">
+        <div class="video-item">
+          <video width="200" height="300" controls autoplay loop>
+            <source type="video/mp4">
+          </video>
+          <span class="action-bar">
+            <span class="u-action u-action-prev">上一个</span>
+            <span class="u-action u-action-next">下一个</span>
+            <span class="u-action icon-item icon-unstart">
+              <iconify-icon icon="ant-design:star-outlined" class="unstart"></iconify-icon>
+              <iconify-icon icon="flowbite:star-solid" class="stared"></iconify-icon>
+            </span>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="./lib/iconify-icon.min.js"></script>
+    <script src="./lib/jquery-v3.6.0.min.js"></script>
+    <script src="./lib/eruda-3.2.1.min.js"></script>
+    <script>
+      var videoUtils = {
+        // 暂停视频（找到子元素<video>）
+        pause: ($videoItem) => {
+          var result = true;
+          try {
+            $videoItem.find("video")[0].pause();
+          } catch (error) {
+            // 视频未加载成功 则 pause() 会抛出异常
+            result = false;
+            // then do nothing
+          }
+          return result;
+        },
+        // 存储视频地址(自动找到 .video-item容器 下的视频地址)
+        saveVideoSrc: (actionItem, storeKey) => {
+          var $videoItem = null;
+          if ($(actionItem).hasClass("video-item")) {
+            $videoItem = $(actionItem);
+          }
+          else {
+            $videoItem = $(actionItem).parents(".video-item");
+          }
+
+          var src = $videoItem.find("video source").attr("src");
+
+          storeKey = storeKey || "video_src_list";
+          var video_src_list_string = localStorage.getItem(storeKey);
+          var videoList = video_src_list_string ? JSON.parse(video_src_list_string) : [];
+          videoList.push(src);
+          localStorage.setItem(storeKey, JSON.stringify(videoList));
+        },
+      };
+
+      $(function () {
+        // 提示工具
+        var toastr = new Toastr();
+
+
+        // 下一条
+        $(".video-list")
+        .on("click", ".u-action-next", function () {
+          var lastVideoItem = $(this).parents(".video-item");
+
+          // 如果已经有下一条，则直接切换
+          if (lastVideoItem.next(".video-item").length > 0) {
+            console.log("下一条已加载，直接切换~");
+            // 滑走上一个视频
+            lastVideoItem.slideUp(function () {
+              // console.log("slideUp done, video pause!");
+              // 可能还没播放完，需要先暂停
+              videoUtils.pause(lastVideoItem);
+            });
+            // 显示下一个视频
+            lastVideoItem.next(".video-item").fadeIn(function () {
+              // 继续播放
+              $(this).find("video")[0].play();
+            });
+            return;
+          }
+
+          // 没有下一条，则加载新视频
+          $.get('https://api.kuleu.com/api/xjj?type=json', function(data) {
+            console.log("json:", data);
+
+            if (data.code == 200) {
+              console.log(data.video);
+
+              var videoItem = $($("#videoItemTemplete").html());
+              var videoSource = videoItem.find("video source");
+              // 事件监听
+              // videoSource.parent()[0].addEventListener('loadeddata', () => {
+              //   console.log("video event: loadeddata 媒体的首帧已加载完成");
+              // });
+              // videoSource.parent()[0].addEventListener('loadedmetadata', () => {
+              //   console.log("video event: loadedmetadata 元数据已加载完毕");
+              // });
+              videoSource.attr("src", data.video);
+              $("#videoList").append(videoItem);
+
+              // 滑走上一个视频
+              lastVideoItem.slideUp(function () {
+                // console.log("slideUp done, video pause!");
+                // 可能还没播放完，需要先暂停
+                videoUtils.pause(lastVideoItem);
+              });
+
+              // 保存视频地址
+              videoUtils.saveVideoSrc(videoItem, "ALL_SRC_LIST");
+            }
+          });
+        })
+        // 上一条
+        .on("click", ".u-action-prev", function () {
+          // console.log(" .u-action-prev click", this);
+          var videoItem = $(this).parents(".video-item");
+
+          if (videoItem.prev(".video-item").length == 0) {
+            // console.log("没有上一条了~");
+            toastr.show("没有上一条了~");
+            return;
+          }
+
+          // 可能还没播放完，需要先暂停
+          videoUtils.pause(videoItem);
+          // 隐藏当前条
+          videoItem.fadeOut();
+
+          // 显示上一条
+          videoItem.prev(".video-item").slideDown(function () {
+            // 继续播放
+            $(this).find("video")[0].play();
+          });
+        })
+        // 收藏
+        .on("click", ".unstart", function () {
+          // console.log(" .unstart click", this);
+
+          $(this).parent().addClass("icon-start");
+          // 将视频id及地址 存在本地
+
+          // 保存视频地址
+          videoUtils.saveVideoSrc(this, "USER_LIKE_LIST");
+        })
+        // 取消收藏
+        .on("click", ".stared", function () {
+          // console.log(" .stared click", this);
+
+          $(this).parent().removeClass("icon-start");
+          // 从本地数据删除收藏信息
+        });
+
+        // 菜单
+        $("#moreMenu").click(function () {
+          // console.log("开发中~");
+          toastr.show("开发中~");
+        });
+      });
+
+      // 调试模式
+      $(function () {
+        if (location.href.indexOf("debug") < 0) {
+          console.log("normal mode");
+          return;
+        }
+
+        var clickTimes = 0;
+        $("#headTitle").click(() => {
+          clickTimes++;
+
+          if (clickTimes >= 3) {
+            // 多次调用 eruda.init() 也没关系
+            if (!eruda._isInit) {
+              eruda.init();
+            }
+          }
+
+          // 5秒后 清零
+          setTimeout(() => {
+            clickTimes = 0;
+          }, 5e3);
+        });
+      });
+    </script>
+
+    <link rel="stylesheet" href="./lib/toastr.min.css">
+    <script src="./lib/toastr.min.js"></script>
+  </body>
+</html>

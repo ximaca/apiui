@@ -111,8 +111,8 @@
     </div>
 
     <script src="./lib/iconify-icon.min.js"></script>
-    <script src="./lib/jquery-v3.6.0.min.js"></script>
-    <script src="./lib/eruda-3.2.1.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.6.0.min.js"></script>
+    <!-- <script src="./lib/eruda-3.2.1.min.js"></script> -->
     <script>
       var videoUtils = {
         // 暂停视频（找到子元素<video>）
@@ -265,8 +265,10 @@
 
           if (clickTimes >= 3) {
             // 多次调用 eruda.init() 也没关系
-            if (!eruda._isInit) {
-              eruda.init();
+            if (!window.eruda || !window.eruda._isInit) {
+              $.getScript("https://cdn.jsdelivr.net/npm/eruda", function(data, textStatus, jqxhr) {
+                eruda.init();
+              });
             }
           }
 

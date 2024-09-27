@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>接口测试页</title>
     <style>
+        .head-title {
+            line-height: 2em;
+            font-size: 2em;
+        }
+        .head-title .setting-icon {
+            vertical-align: middle;
+        }
         .u-action {
             padding: 5px 15px;
             border: 1px solid #e0f2fe;
@@ -48,12 +55,18 @@
 <body>
 
     <div style="width: 700px; margin: 0 auto;">
-        <h1>请求接口查看结果</h1>
+        <h1 class="head-title">
+            请求接口查看结果
+            <!-- 设置按钮 -->
+            <a href="#settingPanel" rel="modal:open" class="setting-icon" id="settingIcon">
+                <img width="30px" height="30px" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiNjY2NjY2MiIGQ9Ik0xOS45IDEyLjY2YTEgMSAwIDAgMSAwLTEuMzJsMS4yOC0xLjQ0YTEgMSAwIDAgMCAuMTItMS4xN2wtMi0zLjQ2YTEgMSAwIDAgMC0xLjA3LS40OGwtMS44OC4zOGExIDEgMCAwIDEtMS4xNS0uNjZsLS42MS0xLjgzYTEgMSAwIDAgMC0uOTUtLjY4aC00YTEgMSAwIDAgMC0xIC42OGwtLjU2IDEuODNhMSAxIDAgMCAxLTEuMTUuNjZMNSA0Ljc5YTEgMSAwIDAgMC0xIC40OEwyIDguNzNhMSAxIDAgMCAwIC4xIDEuMTdsMS4yNyAxLjQ0YTEgMSAwIDAgMSAwIDEuMzJMMi4xIDE0LjFhMSAxIDAgMCAwLS4xIDEuMTdsMiAzLjQ2YTEgMSAwIDAgMCAxLjA3LjQ4bDEuODgtLjM4YTEgMSAwIDAgMSAxLjE1LjY2bC42MSAxLjgzYTEgMSAwIDAgMCAxIC42OGg0YTEgMSAwIDAgMCAuOTUtLjY4bC42MS0xLjgzYTEgMSAwIDAgMSAxLjE1LS42NmwxLjg4LjM4YTEgMSAwIDAgMCAxLjA3LS40OGwyLTMuNDZhMSAxIDAgMCAwLS4xMi0xLjE3Wk0xOC40MSAxNGwuOC45bC0xLjI4IDIuMjJsLTEuMTgtLjI0YTMgMyAwIDAgMC0zLjQ1IDJMMTIuOTIgMjBoLTIuNTZMMTAgMTguODZhMyAzIDAgMCAwLTMuNDUtMmwtMS4xOC4yNGwtMS4zLTIuMjFsLjgtLjlhMyAzIDAgMCAwIDAtNGwtLjgtLjlsMS4yOC0yLjJsMS4xOC4yNGEzIDMgMCAwIDAgMy40NS0yTDEwLjM2IDRoMi41NmwuMzggMS4xNGEzIDMgMCAwIDAgMy40NSAybDEuMTgtLjI0bDEuMjggMi4yMmwtLjguOWEzIDMgMCAwIDAgMCAzLjk4bS02Ljc3LTZhNCA0IDAgMSAwIDQgNGE0IDQgMCAwIDAtNC00bTAgNmEyIDIgMCAxIDEgMi0yYTIgMiAwIDAgMS0yIDIiLz48L3N2Zz4=" alt="">
+            </a>
+        </h1>
 
         <div>
             <p>
-                说明： 使用 <span id="apiText">http://88zhan.cn/api.php</span> 接口。
-                <a id="apiDoc" href="https://api.aa1.cn/doc/88zhan-cn.html" target="_blank" rel="noopener noreferrer">查看接口文档</a>
+                说明： 使用 <span id="apiText">https://api.yujn.cn/api/manzhan.php?type=video</span> 接口。
+                <a id="apiDoc" href="https://www.yujn.cn/?action=interface&id=349" target="_blank" rel="noopener noreferrer">查看接口文档</a>
 
                 <br>
                 <!-- 特别说明 -->
@@ -85,9 +98,47 @@
 
                     <!-- 对结果的操作 -->
                     <p style="display: none;" id="resultActionBox">
-                        <span class="u-action u-action-result" id="resultActionButton">执行</span>
+                        <a id="openVideoButton" href="#" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                            <span class="u-action u-action-result" id="resultActionButton">执行</span>
+                        </a>
                     </p>
                 </div>
+            </div>
+        </div>
+
+        <!-- 设置面板 -->
+        <div style="display: none;">
+            <div id="settingPanel" class="modal">
+                <h2 style="margin-top: 0;">设置面板</h2>
+                <p>
+                    当前测试接口： 
+                    <span id="apiText2">-</span>
+                </p>
+                <p>
+                    切换测试接口：
+                    <select id="apiSettingSelect">
+                        <optgroup label="小姐姐视频">
+                            <option value="pear_xjj">随机小姐姐视频</option>
+                            <option value="new_sister_video">新小姐姐视频【云端版】（速度较慢）</option>
+                            <option value="girls_video">小姐姐视频_分区版（早期接口，做了特殊处理）</option>
+                            <option value="kuleu_xjj">随机性感小姐姐视频</option>
+                            <option value="meinv_video">随机美女视频</option>
+                            <option value="nvdaxuesheng">快手女大学生系列视频-直接跳转</option>
+                            <option value="sjsp_video">随机小姐姐视频-直接跳转</option>
+                            <option value="juhexjj">随机输出各种类型小姐姐-直接跳转</option>
+                            <option value="shwd">丝滑舞蹈视频-直接跳转</option>
+                            <option value="wmsc">身材系列视频-直接跳转</option>
+                            <option value="baisis">白丝视频-直接跳转</option>
+                            <option value="heisis">黑丝视频-直接跳转</option>
+                        </optgroup>
+                        <optgroup label="漫展视频">
+                            <option value="manzhan">漫展现场随机视频</option>
+                        </optgroup>
+                    </select>
+                </p>
+                <a href="#" rel="modal:close" style="text-decoration: none; float: right;">
+                    <span class="u-action u-action-setting-ok" id="settingOkButton">确定</span>
+                </a>
             </div>
         </div>
     </div>
@@ -103,7 +154,11 @@
                 doc: "https://api.aa1.cn/doc/pear_xjj.html",
                 dataType: "json",
                 requireParam: false,
-                // success
+                success: {
+                    buttonText: "直接打开播放视频",
+                    // action属性的简化配置
+                    openUrl: (data) => data.data,
+                },
             },
             // 新小姐姐视频【云端版】(本接口对接NAS资源实时更新数据均采用国内高速服务器，视频资源均有网友提供。)
             new_sister_video: {
@@ -161,11 +216,10 @@
             },
             // 【不支持跨域】快手女大学生系列视频
             nvdaxuesheng: {
-                // type参数支持 text/json/video ，默认是video
-                url: "https://api.yujn.cn/api/nvda.php?type=json",
+                // 用新窗口打开的方式来测试
+                url: "https://api.yujn.cn/api/nvda.php?type=video",
                 doc: "https://www.yujn.cn/?action=interface&id=384",
-                dataType: "json",
-                requireParam: false,
+                dataType: "video-binary-stream",
             },
             // 随机性感小姐姐视频
             kuleu_xjj: {
@@ -181,6 +235,67 @@
                     },
                 },
             },
+            // 随机美女视频
+            meinv_video: {
+                // 带参数可以直接返回mp4文件： https://v2.api-m.com/api/meinv?return=302
+                url: "https://v2.api-m.com/api/meinv",
+                doc: "https://api.aa1.cn/doc/meinv.html",
+                dataType: "json",
+                requireParam: false,
+                success: {
+                    buttonText: "新窗口打开",
+                    // action属性的简化配置
+                    openUrl: (data) => data.data,
+                },
+            },
+            // 随机小姐姐视频
+            sjsp_video: {
+                url: "https://jx.iqfk.top/api/sjsp.php",
+                doc: "https://api.aa1.cn/doc/dxhy-xjj.html",
+                dataType: "video-binary-stream",
+            },
+            // 【不支持跨域】小姐姐类资源视频，随机输出各种类型
+            juhexjj: {
+                // 用新窗口打开的方式来测试
+                url: "http://api.yujn.cn/api/juhexjj.php?type=video",
+                doc: "https://www.yujn.cn/?action=interface&id=224",
+                dataType: "video-binary-stream",
+            },
+            // 【不支持跨域】随机返回丝滑舞蹈视频
+            shwd: {
+                // 用新窗口打开的方式来测试
+                url: "http://api.yujn.cn/api/shwd.php?type=video",
+                doc: "https://www.yujn.cn/?action=interface&id=304",
+                dataType: "video-binary-stream",
+            },
+            // 【不支持跨域】返回身材系列视频
+            wmsc: {
+                // 用新窗口打开的方式来测试
+                url: "http://api.yujn.cn/api/wmsc.php?type=video",
+                doc: "https://www.yujn.cn/?action=interface&id=305",
+                dataType: "video-binary-stream",
+            },
+            // 【不支持跨域】白丝视频
+            baisis: {
+                // 用新窗口打开的方式来测试
+                url: "http://api.yujn.cn/api/baisis.php?type=video",
+                doc: "https://www.yujn.cn/?action=interface&id=166",
+                dataType: "video-binary-stream",
+            },
+            // 【不支持跨域】黑丝视频
+            heisis: {
+                // 用新窗口打开的方式来测试
+                url: "http://api.yujn.cn/api/heisis.php?type=video",
+                doc: "https://www.yujn.cn/?action=interface&id=167",
+                dataType: "video-binary-stream",
+            },
+            // 【不支持跨域】漫展现场随机视频
+            manzhan: {
+                // 用新窗口打开的方式来测试
+                url: "https://api.yujn.cn/api/manzhan.php?type=video",
+                doc: "https://www.yujn.cn/?action=interface&id=349",
+                dataType: "video-binary-stream",
+            },
             // XX接口
             aaa: {
                 url: "https://aaa",
@@ -193,6 +308,7 @@
                 //         var url = data.xxx;
                 //         url && window.open(url, "_blank");
                 //     },
+                //     openUrl: (data) => data.data,
                 // },
             },
             current: "new_sister_video",
@@ -219,19 +335,38 @@
                 var apiData = apiUrl[name];
                 $("#apiText").text(apiData.url);
                 $("#apiDoc").attr("href", apiData.doc);
+
+                // 更新设置面板的值
+                $("#apiSettingSelect").val(name);
+                $("#apiText2").text(apiData.url);
             };
 
             // 初始化
             // updateApiText(apiUrl.current);
             // updateApiText("new_sister_video");
             // updateApiText("girls_video");
-            updateApiText("kuleu_xjj");
+            // updateApiText("nvdaxuesheng");
+            // updateApiText("kuleu_xjj");
+            // updateApiText("meinv_video");
+            // updateApiText("sjsp_video");
+            // updateApiText("juhexjj");
+            // updateApiText("shwd");
+            // updateApiText("wmsc");
+            // updateApiText("baisis");
+            // updateApiText("heisis");
+            updateApiText("manzhan");
 
             $("#startButton").click(function () {
                 var apiConfig = apiUrl[apiUrl.current];
                 var paramText = getParamText();
                 if (apiConfig.requireParam && !paramText) {
                     toastr.show("参数不能为空，请重新输入");
+                    return;
+                }
+
+                // 支持新的类型，直接打开新窗口测接口
+                if (apiConfig.dataType === "video-binary-stream") {
+                    window.open(apiConfig.url + paramText, "_blank");
                     return;
                 }
 
@@ -256,20 +391,32 @@
 
                         toastr.show("已返回操作结果，请查看");
 
-                        // 重置事件
-                        $("#resultActionButton").unbind();
                         // 展示 结果执行按钮
                         if (apiConfig.success) {
                             $("#resultActionBox").show();
+                            // 先重置事件
+                            $("#openVideoButton")
+                                .unbind()
+                                .attr("href", "#");
+
                             if (apiConfig.success.buttonText) {
                                 $("#resultActionButton").text(apiConfig.success.buttonText);
                             }
                             // 绑定新事件
                             if (apiConfig.success.action) {
-                                $("#resultActionButton").click(function () {
+                                $("#openVideoButton").click(function () {
                                     apiConfig.success.action(data, textStatus, jqXHR, this);
+                                    return false;
                                 });
                             }
+                            // 打开新窗口的链接
+                            else if (apiConfig.success.openUrl) {
+                                $("#openVideoButton").attr("href", apiConfig.success.openUrl(data));
+                            }
+                        }
+                        else {
+                            // 直接隐藏 结果执行按钮
+                            $("#resultActionBox").hide();
                         }
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -289,7 +436,19 @@
                 toastr.show("功能开发中...");
             });
 
+            // 打开设置面板
+            $("#settingIcon").click(function () {
+                // 更新下拉框的值
+                $("#apiSettingSelect").val(apiUrl.current);
+            });
+            // 完成设置
+            $("#settingOkButton").click(function () {
+                updateApiText($("#apiSettingSelect").val());
+            });
         });
     </script>
+
+    <link rel="stylesheet" href="./lib/jquery.modal-0.9.1.min.css">
+    <script src="./lib/jquery.modal-0.9.1.min.js" defer></script>
 </body>
 </html>

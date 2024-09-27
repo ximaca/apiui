@@ -130,9 +130,16 @@
                             <option value="wmsc">身材系列视频-直接跳转</option>
                             <option value="baisis">白丝视频-直接跳转</option>
                             <option value="heisis">黑丝视频-直接跳转</option>
+                            <option value="newsp_video">高质量美女视频-直接跳转</option>
+                            <option value="girl_video_7645">美女视频-下载</option>
+                            <option value="moyuribaoshipin">摸鱼日报美女视频</option>
                         </optgroup>
                         <optgroup label="漫展视频">
                             <option value="manzhan">漫展现场随机视频</option>
+                        </optgroup>
+                        <optgroup label="其它视频">
+                            <option value="sex_video">性福视频</option>
+                            <option value="vs_video">微视随机展示视频</option>
                         </optgroup>
                     </select>
                 </p>
@@ -296,6 +303,75 @@
                 doc: "https://www.yujn.cn/?action=interface&id=349",
                 dataType: "video-binary-stream",
             },
+            // 高质量美女视频
+            newsp_video: {
+                url: "https://www.wudada.online/Api/NewSp",
+                doc: "https://api.aa1.cn/doc/gzlmv.html",
+                dataType: "video-binary-stream",
+            },
+            // 性福视频
+            sex_video: {
+                url: "./#http://api.7645.cn/video/index.php?type=sex_video&id=n",
+                // sex_video类型的最大id目前是385
+                doc: "https://api.aa1.cn/doc/sex_vide.html",
+                // 显示页面内容文本
+                dataType: "text",
+                requireParam: false,
+                success: {
+                    buttonText: "随机播放视频",
+                    action: (data, textStatus, jqXHR) => {
+                        var random = Math.ceil(Math.random() * 385);
+                        var param = $("#urlText").val() || random;
+                        var url = "http://api.7645.cn/video/index.php?type=sex_video&id=" + param;
+                        console.log("打开url：", url);
+                        window.open(url, "_blank");
+                    },
+                },
+            },
+            // 美女视频
+            girl_video_7645: {
+                url: "./#http://api.7645.cn/video/index.php?type=girl_video&id=n",
+                // type 参数为 girl_video 时，会直接下载美女视频，除非是 https://api.7645.cn/video/index.php?type=girl_video&id=5633
+                doc: "https://api.7645.cn/",
+                // 显示页面内容文本
+                dataType: "text",
+                requireParam: false,
+                success: {
+                    buttonText: "随机下载视频",
+                    action: (data, textStatus, jqXHR) => {
+                        var random = Math.ceil(Math.random() * 5600);
+                        var param = $("#urlText").val() || random;
+                        var url = "http://api.7645.cn/video/index.php?type=girl_video&id=" + param;
+                        console.log("下载url：", url);
+                        window.open(url, "_blank");
+                    },
+                },
+            },
+            // 摸鱼日报美女视频版
+            moyuribaoshipin: {
+                // 该接口每天都会返回相同的结果，如 https://dayu.qqsuu.cn/moyuribaoshipin/file/20240927.mp4
+                url: "https://dayu.qqsuu.cn/moyuribaoshipin/apis.php?type=json",
+                doc: "https://api.aa1.cn/doc/moyuribaoshipin.html",
+                dataType: "json",
+                requireParam: false,
+                success: {
+                    buttonText: "打开今日摸鱼日报美女视频",
+                    // action属性的简化配置
+                    openUrl: (data) => data.data,
+                },
+            },
+            // 微视随机展示视频
+            vs_video: {
+                url: "https://v.api.aa1.cn/api/api-vs/index.php",
+                doc: "https://api.aa1.cn/doc/api-vs.html",
+                dataType: "json",
+                requireParam: false,
+                success: {
+                    buttonText: "打开微视随机视频",
+                    // action属性的简化配置
+                    openUrl: (data) => data.url,
+                },
+            },
             // XX接口
             aaa: {
                 url: "https://aaa",
@@ -355,6 +431,11 @@
             // updateApiText("baisis");
             // updateApiText("heisis");
             updateApiText("manzhan");
+            // updateApiText("newsp_video");
+            // updateApiText("sex_video");
+            // updateApiText("girl_video_7645");
+            // updateApiText("moyuribaoshipin");
+            // updateApiText("vs_video");
 
             $("#startButton").click(function () {
                 var apiConfig = apiUrl[apiUrl.current];
@@ -367,6 +448,8 @@
                 // 支持新的类型，直接打开新窗口测接口
                 if (apiConfig.dataType === "video-binary-stream") {
                     window.open(apiConfig.url + paramText, "_blank");
+                    // 隐藏执行按钮
+                    $("#resultActionBox").hide();
                     return;
                 }
 

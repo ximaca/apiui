@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接口测试页</title>
+    <style>
+        .u-action {
+            padding: 5px 15px;
+            border: 1px solid #e0f2fe;
+            border-radius: 9999px;
+            background-color: #f0f9ff;
+            color: #0284c7;
+            font-size: 16px;
+            cursor: pointer;
+            transition: .2s all linear;
+        }
+        .u-action:hover {
+            border-color: #0284c7;
+            box-shadow: rgba(0,0,0,.15) 1.95px 1.95px 2.6px;
+        }
+        .u-action-orange {
+            border: 1px solid #ffdd1f;
+            background-color: #fff9dc;
+            color: #ff712a;
+        }
+        .u-action-orange:hover {
+            border-color: #ff8d10;
+        }
+        .description-text {
+            font-size: 12px;
+            color: #ccc;
+        }
+        .result-box {
+            overflow: auto;
+            min-height: 50px;
+            max-height: 200px;
+            padding: 5px;
+            border: 1px dashed grey;
+            white-space: pre-wrap;
+        }
+        .result-box:empty::after {
+            content: attr(data-placeholder);
+            color: #E0E0E0;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="width: 700px; margin: 0 auto;">
+        <h1>请求接口查看结果</h1>
+
+        <div>
+            <p>
+                说明： 使用 <span id="apiText">http://88zhan.cn/api.php</span> 接口。
+                <a id="apiDoc" href="https://api.aa1.cn/doc/88zhan-cn.html" target="_blank" rel="noopener noreferrer">查看接口文档</a>
+
+                <br>
+                <!-- 特别说明 -->
+                <span class="description-text">若接口不支持跨域，则会提示操作失败</span>
+            </p>
+            <div>
+                <span>查询字符串参数：</span>
+
+                <span id="jsonParamButton" style="margin-left: 50px; font-size: 12px; color: #0284c7; cursor: pointer; line-height: 22px; vertical-align: text-top;">
+                    切换为JSON参数
+                </span>
+            </div>
+            <div>
+                <textarea id="urlText" rows="5" style="width: 100%;" placeholder="a=1&b=2"></textarea>
+            </div>
+            <div>
+                <p style="margin: 10px 0 30px;">
+                    <span class="u-action u-action-start" id="startButton">开始请求</span>
+                </p>
+            </div>
+
+            <hr>
+            <div>
+                <span>操作结果</span>
+            </div>
+            <div>
+                <div>
+                    <pre class="result-box" id="resultBox" data-placeholder="未开始"></pre>
+
+                    <!-- 对结果的操作 -->
+                    <p style="display: none;" id="resultActionBox">
+                        <span class="u-action u-action-result" id="resultActionButton">执行</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./lib/jquery-v3.6.0.min.js"></script>
+    <link rel="stylesheet" href="./lib/toastr.min.css">
+    <script src="./lib/toastr.min.js"></script>
+    <script>
+        var apiUrl = {
+            // 随机返回一条小姐姐视频
+            pear_xjj: {
+                url: "https://tools.mgtv100.com/external/v1/pear/xjj",
+                doc: "https://api.aa1.cn/doc/pear_xjj.html",
+                dataType: "json",
+                requireParam: false,
+                // success
+            },
+            // 新小姐姐视频【云端版】(本接口对接NAS资源实时更新数据均采用国内高速服务器，视频资源均有网友提供。)
+            new_sister_video: {
+                // 该接口播放视频成功率不高，接口响应速度也不够快
+                url: "https://api.mhimg.cn/api/New_sister_video/",
+                doc: "https://api.aa1.cn/doc/New_sister_video.html",
+                dataType: "json",
+                requireParam: false,
+                success: {
+                    buttonText: "打开视频",
+                    action: (data, textStatus, jqXHR) => {
+                        var url = data.videos && data.videos[0] && data.videos[0].video_url;
+                        url && window.open(url, "_blank");
+                    },
+                },
+            },
+            // 小姐姐视频_分区版 接口（该接口结果会302到 mp4资源地址）
+            girls_video: {
+                url: "./",
+                doc: "https://api.aa1.cn/doc/girls_video.html",
+                // 显示页面内容文本
+                dataType: "text",
+                requireParam: false,
+                success: {
+                    buttonText: "直接打开播放视频",
+                    action: (data, textStatus, jqXHR) => {
+                        // 默认为随机视频，参数值见飞书文档 https://iatuqyq5dtq.feishu.cn/sheets/JXqAsPXWLhvquUtB2nec6z6onoh
+                        var param = $("#urlText").val() || "all";
+                        var url = "https://api.mhimg.cn/api/girls_video/?sort=" + param;
+                        url && window.open(url, "_blank");
+                    },
+                },
+            },
+            // 【不支持跨域】小姐姐短视频，「随机」遍历目录下文件，视频数据来源于自媒体平台
+            api_girl_can_not_cors: {
+                /*
+                    3种请求方式：
+                    直接请求 https://tucdn.wpon.cn/api-girl/index.php 会返回 <video>标签 静音播放视频。
+                    若请求 http://tucdn.wpon.cn/api-girl/index.php?wpon=url 则会返回一个 mp4地址文本。
+                    【不支持跨域】第三种是下面在用请求 https://tucdn.wpon.cn/api-girl/index.php?wpon=json 。
+
+                    此接口还有 https://tucdn.wpon.cn/api-girl/videos/1.mp4 - https://tucdn.wpon.cn/api-girl/videos/141.mp4 共141个视频文件。
+                */
+                url: "https://tucdn.wpon.cn/api-girl/index.php?wpon=json",
+                doc: "https://api.aa1.cn/doc/girl.html",
+                dataType: "json",
+                requireParam: false,
+                success: {
+                    buttonText: "新窗口打开",
+                    action: (data, textStatus, jqXHR) => {
+                        // var url = data.xxx;
+                        // url && window.open(url, "_blank");
+                    },
+                },
+            },
+            // 【不支持跨域】快手女大学生系列视频
+            nvdaxuesheng: {
+                // type参数支持 text/json/video ，默认是video
+                url: "https://api.yujn.cn/api/nvda.php?type=json",
+                doc: "https://www.yujn.cn/?action=interface&id=384",
+                dataType: "json",
+                requireParam: false,
+            },
+            // 随机性感小姐姐视频
+            kuleu_xjj: {
+                url: "https://api.kuleu.com/api/xjj?type=json",
+                doc: "https://api.aa1.cn/doc/jkllt.html",
+                dataType: "json",
+                requireParam: false,
+                success: {
+                    buttonText: "直接打开播放视频",
+                    action: (data, textStatus, jqXHR) => {
+                        var url = data.video;
+                        url && window.open(url, "_blank");
+                    },
+                },
+            },
+            // XX接口
+            aaa: {
+                url: "https://aaa",
+                doc: "https://aaa",
+                dataType: "json",
+                requireParam: false,
+                // success: {
+                //     buttonText: "新窗口打开",
+                //     action: (data, textStatus, jqXHR) => {
+                //         var url = data.xxx;
+                //         url && window.open(url, "_blank");
+                //     },
+                // },
+            },
+            current: "new_sister_video",
+        };
+
+        $(function () {
+            var toastr = new Toastr();
+
+            var getParamText = () => {
+                var paramText = $("#urlText").val();
+                paramText = $.trim(paramText);
+
+                return paramText;
+            };
+            // 更新api信息
+            var updateApiText = (name) => {
+                if (!apiUrl[name]) {
+                    return;
+                }
+                if (name === apiUrl.current) {
+                    return;
+                }
+                apiUrl.current = name;
+                var apiData = apiUrl[name];
+                $("#apiText").text(apiData.url);
+                $("#apiDoc").attr("href", apiData.doc);
+            };
+
+            // 初始化
+            // updateApiText(apiUrl.current);
+            // updateApiText("new_sister_video");
+            // updateApiText("girls_video");
+            updateApiText("kuleu_xjj");
+
+            $("#startButton").click(function () {
+                var apiConfig = apiUrl[apiUrl.current];
+                var paramText = getParamText();
+                if (apiConfig.requireParam && !paramText) {
+                    toastr.show("参数不能为空，请重新输入");
+                    return;
+                }
+
+                $("#resultBox").attr("data-placeholder", "进行中...");
+
+                $.ajax({
+                    url: apiConfig.url,
+                    data: {
+                        // aaa: paramText
+                    },
+                    dataType: apiConfig.dataType || "json",
+                    // 超时设置
+                    timeout: 300e5,
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        if (!apiConfig.dataType || (apiConfig.dataType === "json")) {
+                            $("#resultBox").text(JSON.stringify(data, null, 4));
+                        }
+                        else if ((apiConfig.dataType === "text") || apiConfig.dataType === "html") {
+                            $("#resultBox").text(data);
+                        }
+
+                        toastr.show("已返回操作结果，请查看");
+
+                        // 重置事件
+                        $("#resultActionButton").unbind();
+                        // 展示 结果执行按钮
+                        if (apiConfig.success) {
+                            $("#resultActionBox").show();
+                            if (apiConfig.success.buttonText) {
+                                $("#resultActionButton").text(apiConfig.success.buttonText);
+                            }
+                            // 绑定新事件
+                            if (apiConfig.success.action) {
+                                $("#resultActionButton").click(function () {
+                                    apiConfig.success.action(data, textStatus, jqXHR, this);
+                                });
+                            }
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.show("操作失败，请重试");
+                        // 填充失败信息
+                        $("#resultBox").attr("data-placeholder", "操作失败").text("");
+                        // 隐藏执行按钮
+                        $("#resultActionBox").hide();
+
+                        console.log(jqXHR, textStatus, errorThrown);
+                    },
+                });
+            });
+
+            // 切换为JSON参数
+            $("#jsonParamButton").click(() => {
+                toastr.show("功能开发中...");
+            });
+
+        });
+    </script>
+</body>
+</html>
